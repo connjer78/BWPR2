@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel="stylesheet" href="https://p.trellocdn.com/power-up.min.css">
+    <link rel="stylesheet" href="./style.css"> <!-- Changed from './css/style.css' -->
+    <script src="https://p.trellocdn.com/power-up.min.js"></script>
+  </head>
+  <body>
+    <form id="create-project-form">
+      <label for="due-date">Due Date:</label>
+      <input type="date" id="due-date" name="due-date">
+      
+      <label for="members">Assign Members:</label>
+      <select id="members" name="members" multiple>
+        <!-- Options will be populated dynamically -->
+      </select>
+      
+      <button type="button" class="button" id="create-project">Create Project Card</button>
+    </form>
+    <script src="./popup.js"></script> <!-- Changed from './js/project-card-popup.js' -->
+  </body>
+</html>
