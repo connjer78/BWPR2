@@ -6,14 +6,13 @@
 </head>
 <body>
     <script>
-        var TRELLO_APP_KEY = '6fd96e65b3bbfbf2c88bd5eb871fab8a'; // Your Project Cards Power-Up API key
+        var TRELLO_APP_KEY = '6fd96e65b3bbfbf2c88bd5eb871fab8a';
         var t = window.TrelloPowerUp.iframe({
             appKey: TRELLO_APP_KEY,
             appName: 'Project Cards Power-Up'
         });
 
         t.render(function(){
-            // Add a button for the user to click
             var authorizeButton = document.createElement('button');
             authorizeButton.textContent = 'Authorize Project Cards Power-Up';
             authorizeButton.addEventListener('click', function() {

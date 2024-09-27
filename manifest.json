@@ -1,12 +1,17 @@
 {
   "name": "Project Cards Power-Up",
-  "details": "Create project cards from account cards in Trello",
+  "description": "Create project cards from account cards in Trello",
+  "key": "6fd96e65b3bbfbf2c88bd5eb871fab8a",
   "icon": {
     "url": "https://connjer78.github.io/BWPR/assets/rocketship.PNG"
   },
   "author": "Jeremy Conner",
   "capabilities": [
     "card-buttons"
+  ],
+  "scopes": [
+    "read",
+    "write"
   ],
   "connectors": {
     "iframe": {
