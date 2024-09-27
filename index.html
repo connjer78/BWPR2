@@ -2,12 +2,48 @@
 <html>
   <head>
     <meta charset="utf-8">
-    <title>Project Cards Power-Up</title>
-    <script src="https://p.trellocdn.com/power-up.min.js"></script>
-    <script src="./client.js"></script> <!-- Changed from './js/client.js' -->
   </head>
   <body>
-    <h1>Project Cards Power-Up</h1>
-    <p>This is a placeholder page. The real magic happens in Trello!</p>
+    <script src="https://p.trellocdn.com/power-up.min.js"></script>
+    <script>
+      var TRELLO_APP_KEY = '6fd96e65b3bbfbf2c88bd5eb871fab8a';
+
+      window.TrelloPowerUp.initialize({
+        'card-buttons': function(t) {
+          return t.getRestApi()
+            .isAuthorized()
+            .then(function(isAuthorized) {
+              if (isAuthorized) {
+                return [{
+                  icon: 'https://connjer78.github.io/BWPR/assets/rocketship.PNG',
+                  text: 'Create Project',
+                  callback: function(t) {
+                    return t.popup({
+                      title: "Create Project Card",
+                      url: './popup.html',
+                      height: 300
+                    });
+                  }
+                }];
+              } else {
+                return [{
+                  icon: 'https://connjer78.github.io/BWPR/assets/rocketship.PNG',
+                  text: 'Create Project',
+                  callback: function(t) {
+                    return t.popup({
+                      title: "Authorize to Continue",
+                      url: './authorize.html',
+                      height: 140
+                    });
+                  }
+                }];
+              }
+            });
+        }
+      }, {
+        appKey: TRELLO_APP_KEY,
+        appName: 'Project Cards Power-Up'
+      });
+    </script>
   </body>
 </html>

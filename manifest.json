@@ -2,13 +2,11 @@
   "name": "Project Cards Power-Up",
   "details": "Create project cards from account cards in Trello",
   "icon": {
-    "url": "https://your-domain.com/icon.png"
+    "url": "https://connjer78.github.io/BWPR/assets/rocketship.PNG"
   },
-  "author": "Your Name",
+  "author": "Jeremy Conner",
   "capabilities": [
-    "callback",
-    "card-buttons",
-    "attachment-sections"
+    "card-buttons"
   ],
   "connectors": {
     "iframe": {

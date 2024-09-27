@@ -79,3 +79,7 @@ To customize the Power-Up, modify the relevant JavaScript files in the `src` dir
 ## Troubleshooting
 
 If you encounter issues while using the Project Cards Power-Up, try the following:
+
+## Author
+
+Jeremy Conner
