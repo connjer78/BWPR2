@@ -281,7 +281,7 @@
 
                 return getFirstListIdFromProjectsBoard()
                     .then(listId => {
-                        console.log('First list ID:', listId);
+                        console.log('First list ID:', listId); // Log the list ID
                         // Prepare the new card details
                         const newCardName = sourceCard.name; // Copy the name from the source card
                         const newCardDescription = sourceCard.desc; // Optionally copy the description
@@ -302,14 +302,15 @@
                     .then(response => {
                         console.log('Response from card creation API:', response); // Log the response
                         if (!response.ok) {
-                            throw new Error(`HTTP error! status: ${response.status}`);
+                            return response.json().then(err => {
+                                throw new Error(`HTTP error! status: ${response.status}, message: ${err.message}`);
+                            });
                         }
                         return response.json();
                     })
                     .then(newCard => {
                         console.log('New card created successfully:', newCard);
-                        // Optionally close the popup or provide feedback to the user
-                        t.closePopup();
+                        t.closePopup(); // Close the popup after successful creation
                     })
                     .catch(error => {
                         console.error('Error creating new card:', error);
@@ -341,6 +342,10 @@
                             })
                             .catch(error => {
                                 console.error('Failed to create the new card:', error);
+                            })
+                            .finally(() => {
+                                // Ensure the popup closes regardless of success or failure
+                                t.closePopup();
                             });
                     });
                 } else {
