@@ -215,22 +215,25 @@
             function getFirstListIdFromProjectsBoard() {
                 console.log('Getting Projects board ID...');
 
-                return getAllBoardsInWorkspace()
-                    .then(boards => {
-                        // Find the "Projects" board
-                        const projectsBoard = boards.find(board => board.name === 'Projects');
-                        if (!projectsBoard) {
-                            throw new Error('Projects board not found.');
-                        }
-                        console.log('Found Projects board:', projectsBoard);
+                return t.getRestApi().getToken() // Fetch the token first
+                    .then(function(token) {
+                        return getAllBoardsInWorkspace()
+                            .then(boards => {
+                                // Find the "Projects" board
+                                const projectsBoard = boards.find(board => board.name === 'Projects');
+                                if (!projectsBoard) {
+                                    throw new Error('Projects board not found.');
+                                }
+                                console.log('Found Projects board:', projectsBoard);
 
-                        // Fetch the lists for the "Projects" board
-                        return fetch(`https://api.trello.com/1/boards/${projectsBoard.id}/lists?key=${TRELLO_APP_KEY}&token=${token}`, {
-                            method: 'GET',
-                            headers: {
-                                'Accept': 'application/json'
-                            }
-                        });
+                                // Fetch the lists for the "Projects" board using the token
+                                return fetch(`https://api.trello.com/1/boards/${projectsBoard.id}/lists?key=${TRELLO_APP_KEY}&token=${token}`, {
+                                    method: 'GET',
+                                    headers: {
+                                        'Accept': 'application/json'
+                                    }
+                                });
+                            });
                     })
                     .then(response => {
                         if (!response.ok) {
