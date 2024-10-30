@@ -148,23 +148,45 @@
             // Retrieve the source card name
             var sourceCardName = card.name; // Get the name of the source card
 
-            // Function to get the ID of the "Projects" board
+            // Function to get the ID of the "Projects" board using fetch
             function getProjectsBoardId() {
                 console.log('Fetching all boards for the member...');
-                return t.member('boards') // Fetch all boards for the member
-                    .then(function(boards) {
+                
+                // Get the organization ID first
+                return t.member('organization')
+                    .then(function(organization) {
+                        const orgId = organization.id; // Get the organization ID
+                        return t.getRestApi().getToken() // Get the token for API calls
+                            .then(function(token) {
+                                // Fetch boards for the organization
+                                return fetch(`https://api.trello.com/1/organizations/${orgId}/boards?filter=open&fields=name,id&token=${token}`, {
+                                    method: 'GET',
+                                    headers: {
+                                        'Accept': 'application/json'
+                                    }
+                                });
+                            });
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+                        return response.json();
+                    })
+                    .then(boards => {
                         console.log('Fetched boards:', boards); // Log the fetched boards
-                        var projectsBoard = boards.find(board => board.name === "Projects");
+                        // Find the board named "Projects"
+                        const projectsBoard = boards.find(board => board.name === "Projects");
                         if (projectsBoard) {
-                            console.log('Found Projects board:', projectsBoard);
-                            return projectsBoard.id;
+                            console.log('Found Projects board:', projectsBoard); // Log the found board
+                            return projectsBoard.id; // Return the ID of the "Projects" board
                         } else {
                             throw new Error('Projects board not found');
                         }
                     })
-                    .catch(function(error) {
-                        console.error('Error fetching boards:', error);
-                        throw error;
+                    .catch(error => {
+                        console.error('Error fetching boards:', error); // Log any errors
+                        throw error; // Rethrow the error for further handling
                     });
             }
 
@@ -173,52 +195,57 @@
                 console.log('Getting Projects board ID...');
                 return getProjectsBoardId()
                     .then(function(boardId) {
-                        console.log('Fetching lists for board ID:', boardId);
-                        return t.board(boardId, 'lists')
+                        console.log('Fetching lists for board ID:', boardId); // Log the board ID
+                        return t.board(boardId, 'lists') // Fetch the lists for the "Projects" board
                             .then(function(board) {
-                                console.log('Fetched lists for Projects board:', board.lists);
+                                console.log('Fetched lists for Projects board:', board.lists); // Log the fetched lists
                                 if (board.lists.length > 0) {
-                                    return board.lists[0].id;
+                                    return board.lists[0].id; // Return the ID of the first list
                                 } else {
                                     throw new Error('No lists found in the Projects board');
                                 }
                             });
                     })
                     .catch(function(error) {
-                        console.error('Error fetching lists:', error);
-                        throw error;
+                        console.error('Error fetching lists:', error); // Log any errors
+                        throw error; // Rethrow the error for further handling
                     });
             }
 
             // Add event listener for the create button
             document.getElementById('createButton').addEventListener('click', function() {
-                var suffix = document.getElementById('newCardSuffix').value.trim();
-                var sourceCardName = card.name;
+                var suffix = document.getElementById('newCardSuffix').value.trim(); // Get the user-defined suffix
+                var sourceCardName = card.name; // Get the name of the source card
                 var newCardName = suffix ? `${sourceCardName}: ${suffix}` : sourceCardName;
 
-                console.log('New Card Name:', newCardName);
+                console.log('New Card Name:', newCardName); // Log the new card name
 
+                // Retrieve selected members
                 var selectedMembers = Array.from(document.querySelectorAll('#member-options .option.selected'))
                     .map(option => option.dataset.memberId);
+                // Retrieve selected labels
                 var selectedLabels = Array.from(document.querySelectorAll('#label-options .option.selected'))
                     .map(option => option.dataset.labelId);
 
+                // Get the first list ID from the "Projects" board
                 getFirstListId()
                     .then(function(listId) {
-                        console.log('Creating card in list ID:', listId);
+                        console.log('Creating card in list ID:', listId); // Log the list ID
+                        // Create the new card using the Trello API
                         return t.cards('create', {
                             name: newCardName,
-                            idList: listId,
-                            idMembers: selectedMembers.length > 0 ? selectedMembers : undefined,
-                            idLabels: selectedLabels.length > 0 ? selectedLabels : undefined
+                            idList: listId, // Use the dynamically found list ID
+                            idMembers: selectedMembers.length > 0 ? selectedMembers : undefined, // Only include if there are selected members
+                            idLabels: selectedLabels.length > 0 ? selectedLabels : undefined // Only include if there are selected labels
                         });
                     })
                     .then(function() {
                         console.log('Card created successfully!');
+                        // Optionally, close the popup or provide feedback to the user
                         t.closePopup();
                     })
                     .catch(function(error) {
-                        console.error('Error creating card:', error);
+                        console.error('Error creating card:', error); // Log any errors
                         document.getElementById('error').textContent = 'Error creating card. Please try again.';
                     });
             });
