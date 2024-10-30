@@ -329,7 +329,7 @@
 
             // Example button click handler to create a card
             document.addEventListener('DOMContentLoaded', () => {
-                const createCardButton = document.getElementById('createCardButton');
+                const createCardButton = document.getElementById('yourButtonId');
                 if (createCardButton) {
                     createCardButton.addEventListener('click', () => {
                         console.log('Create Card button clicked.'); // Log button click
@@ -351,14 +351,10 @@
                             })
                             .catch(error => {
                                 console.error('Failed to create the new card:', error);
-                            })
-                            .finally(() => {
-                                // Ensure the popup closes regardless of success or failure
-                                t.closePopup();
                             });
                     });
                 } else {
-                    console.error('Button with ID "createCardButton" not found in the DOM.');
+                    console.error('Button with ID "yourButtonId" not found in the DOM.');
                 }
             });
         })
