@@ -148,6 +148,35 @@
             // Retrieve the source card name
             var sourceCardName = card.name; // Get the name of the source card
 
+            // Function to get the ID of the "Projects" board
+            function getProjectsBoardId() {
+                return t.member('boards') // Fetch all boards for the member
+                    .then(function(boards) {
+                        // Find the board named "Projects"
+                        var projectsBoard = boards.find(board => board.name === "Projects");
+                        if (projectsBoard) {
+                            return projectsBoard.id; // Return the ID of the "Projects" board
+                        } else {
+                            throw new Error('Projects board not found');
+                        }
+                    });
+            }
+
+            // Function to get the first list from the "Projects" board
+            function getFirstListId() {
+                return getProjectsBoardId()
+                    .then(function(boardId) {
+                        return t.board(boardId, 'lists') // Fetch the lists for the "Projects" board
+                            .then(function(board) {
+                                if (board.lists.length > 0) {
+                                    return board.lists[0].id; // Return the ID of the first list
+                                } else {
+                                    throw new Error('No lists found in the Projects board');
+                                }
+                            });
+                    });
+            }
+
             // Add event listener for the create button
             document.getElementById('createButton').addEventListener('click', function() {
                 var suffix = document.getElementById('newCardSuffix').value.trim(); // Get the user-defined suffix
@@ -170,22 +199,26 @@
                 var selectedLabels = Array.from(document.querySelectorAll('#label-options .option.selected'))
                     .map(option => option.dataset.labelId);
 
-                // Create the new card using the Trello API
-                t.cards('create', {
-                    name: newCardName,
-                    idList: 'YOUR_LIST_ID', // Replace with the ID of the list where you want to create the card
-                    idMembers: selectedMembers,
-                    idLabels: selectedLabels
-                })
-                .then(function() {
-                    console.log('Card created successfully!');
-                    // Optionally, close the popup or provide feedback to the user
-                    t.closePopup();
-                })
-                .catch(function(error) {
-                    console.error('Error creating card:', error);
-                    document.getElementById('error').textContent = 'Error creating card. Please try again.';
-                });
+                // Get the first list ID from the "Projects" board
+                getFirstListId()
+                    .then(function(listId) {
+                        // Create the new card using the Trello API
+                        return t.cards('create', {
+                            name: newCardName,
+                            idList: listId, // Use the dynamically found list ID
+                            idMembers: selectedMembers.length > 0 ? selectedMembers : undefined, // Only include if there are selected members
+                            idLabels: selectedLabels.length > 0 ? selectedLabels : undefined // Only include if there are selected labels
+                        });
+                    })
+                    .then(function() {
+                        console.log('Card created successfully!');
+                        // Optionally, close the popup or provide feedback to the user
+                        t.closePopup();
+                    })
+                    .catch(function(error) {
+                        console.error('Error creating card:', error);
+                        document.getElementById('error').textContent = 'Error creating card. Please try again.';
+                    });
             });
         })
         .catch(function(error) {
