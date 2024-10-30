@@ -136,33 +136,35 @@
             t.board('members'),
             t.card('labels') // Fetch labels from the source card
         ])
-        .then(function([data, card]) {
-            console.log('Fetched members:', data); // Log the data to see its structure
-            createMemberSelect(data.members); // Access the members array from the data object
+        .then(function([members, card]) {
+            console.log('Fetched members:', members);
+            createMemberSelect(members);
             console.log('Fetched labels:', card.labels);
             createLabelSelect(card.labels); // Pass the labels to the label select function
+
+            // Retrieve the source card name
+            var sourceCardName = card.name; // Get the name of the source card
+
+            // Add event listener for the create button
+            document.getElementById('createButton').addEventListener('click', function() {
+                var suffix = document.getElementById('newCardSuffix').value.trim(); // Get the user-defined suffix
+                var newCardName;
+
+                // Construct the new card name based on the suffix
+                if (suffix) {
+                    newCardName = `${sourceCardName}: ${suffix}`; // Format: "sourceCardName: suffix"
+                } else {
+                    newCardName = sourceCardName; // Use the source card name if suffix is blank
+                }
+
+                console.log('New Card Name:', newCardName); // Log the new card name
+
+                // Logic to create the project card goes here
+            });
         })
         .catch(function(error) {
             console.error('Error fetching data:', error);
             document.getElementById('error').textContent = 'Error fetching data. Please try again.';
-        });
-
-        // Add event listener for the create button
-        document.getElementById('createButton').addEventListener('click', function() {
-            var suffix = document.getElementById('newCardSuffix').value.trim(); // Get the user-defined suffix and trim whitespace
-            var sourceCardName = "Mama's Fried Chicken"; // Replace with the actual source card name
-            var newCardName;
-
-            // Construct the new card name based on the suffix
-            if (suffix) {
-                newCardName = `${sourceCardName}: ${suffix}`; // Format: "sourceCardName: suffix"
-            } else {
-                newCardName = sourceCardName; // Use the source card name if suffix is blank
-            }
-
-            console.log('New Card Name:', newCardName); // Log the new card name
-
-            // Logic to create the project card goes here
         });
     </script>
 </body>
