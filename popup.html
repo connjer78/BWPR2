@@ -300,6 +300,7 @@
                         });
                     })
                     .then(response => {
+                        console.log('Response from card creation API:', response); // Log the response
                         if (!response.ok) {
                             throw new Error(`HTTP error! status: ${response.status}`);
                         }
@@ -321,6 +322,8 @@
                 const createCardButton = document.getElementById('createCardButton');
                 if (createCardButton) {
                     createCardButton.addEventListener('click', () => {
+                        console.log('Create Card button clicked.'); // Log button click
+
                         const sourceCard = {
                             id: '67226ce3a49b474554362586',
                             name: 'Testinggg',
@@ -334,8 +337,7 @@
                             })
                             .then(() => {
                                 console.log('Card creation process completed.');
-                                // Optionally close the popup if the card was created successfully
-                                t.closePopup();
+                                t.closePopup(); // Close the popup after successful creation
                             })
                             .catch(error => {
                                 console.error('Failed to create the new card:', error);
