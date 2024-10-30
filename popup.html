@@ -331,8 +331,9 @@
             document.addEventListener('DOMContentLoaded', () => {
                 const createCardButton = document.getElementById('createButton');
                 if (createCardButton) {
+                    console.log('Button found: Create Project Card'); // Log if button is found
                     createCardButton.addEventListener('click', () => {
-                        console.log('Create Project Card button clicked.');
+                        console.log('Create Project Card button clicked.'); // Log button click
 
                         // Start a timeout to log if the listener isn't behaving properly
                         const timeoutDuration = 10000; // 10 seconds
