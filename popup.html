@@ -156,6 +156,7 @@
                 return t.member('organization')
                     .then(function(organization) {
                         const orgId = organization.id; // Get the organization ID
+                        console.log('Organization ID:', orgId); // Log the organization ID
                         return t.getRestApi().getToken() // Get the token for API calls
                             .then(function(token) {
                                 // Fetch boards for the organization
