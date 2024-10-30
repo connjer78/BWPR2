@@ -329,10 +329,16 @@
 
             // Example button click handler to create a card
             document.addEventListener('DOMContentLoaded', () => {
-                const createCardButton = document.getElementById('yourButtonId');
+                const createCardButton = document.getElementById('createButton');
                 if (createCardButton) {
                     createCardButton.addEventListener('click', () => {
-                        console.log('Create Card button clicked.'); // Log button click
+                        console.log('Create Project Card button clicked.');
+
+                        // Start a timeout to log if the listener isn't behaving properly
+                        const timeoutDuration = 10000; // 10 seconds
+                        const timeoutId = setTimeout(() => {
+                            console.error('Timeout: The button click event listener is not behaving as expected.');
+                        }, timeoutDuration);
 
                         const sourceCard = {
                             id: '67226ce3a49b474554362586',
@@ -347,14 +353,16 @@
                             })
                             .then(() => {
                                 console.log('Card creation process completed.');
+                                clearTimeout(timeoutId); // Clear the timeout if everything works
                                 t.closePopup(); // Close the popup after successful creation
                             })
                             .catch(error => {
                                 console.error('Failed to create the new card:', error);
+                                clearTimeout(timeoutId); // Clear the timeout in case of an error
                             });
                     });
                 } else {
-                    console.error('Button with ID "yourButtonId" not found in the DOM.');
+                    console.error('Button with ID "createButton" not found in the DOM.');
                 }
             });
         })
