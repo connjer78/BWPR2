@@ -8,10 +8,10 @@
             padding: 10px; 
             overflow-y: auto;
         }
-        .member-select-wrapper {
+        .select-wrapper {
             margin-top: 5px;
         }
-        .member-select-button {
+        .select-button {
             width: 100%;
             text-align: left;
             padding: 5px;
@@ -20,7 +20,7 @@
             border-radius: 3px;
             cursor: pointer;
         }
-        .member-options {
+        .options {
             display: none;
             position: absolute;
             background-color: var(--ds-surface);
@@ -30,14 +30,14 @@
             overflow-y: auto;
             z-index: 1000;
         }
-        .member-option {
+        .option {
             padding: 5px;
             cursor: pointer;
         }
-        .member-option:hover {
+        .option:hover {
             background-color: var(--ds-background-neutral-hovered);
         }
-        .member-option.selected {
+        .option.selected {
             background-color: var(--ds-background-neutral-selected);
         }
     </style>
@@ -45,9 +45,13 @@
 <body>
     <div id="error" class="error"></div>
     <div id="content">
-        <div id="member-select-container" class="member-select-wrapper">
-            <button class="member-select-button">Select members</button>
-            <div class="member-options" id="member-options"></div>
+        <div id="member-select-container" class="select-wrapper">
+            <button class="select-button">Select members</button>
+            <div class="options" id="member-options"></div>
+        </div>
+        <div id="label-select-container" class="select-wrapper">
+            <button class="select-button">Select labels</button>
+            <div class="options" id="label-options"></div>
         </div>
         <button id="createButton" class="mod-primary">Create Project Card</button>
     </div>
@@ -60,12 +64,12 @@
 
         // Function to create the member select UI
         function createMemberSelect(members) {
-            var button = document.querySelector('.member-select-button');
+            var button = document.querySelector('.select-button'); // Select the member button
             var options = document.getElementById('member-options');
 
             members.forEach(function(member) {
                 var option = document.createElement('div');
-                option.className = 'member-option';
+                option.className = 'option';
                 option.textContent = member.fullName;
                 option.dataset.memberId = member.id;
                 option.onclick = function() {
@@ -85,32 +89,64 @@
             });
         }
 
+        // Function to create the label select UI
+        function createLabelSelect(labels) {
+            var button = document.querySelector('#label-select-container .select-button'); // Select the label button
+            var options = document.getElementById('label-options');
+
+            labels.forEach(function(label) {
+                var option = document.createElement('div');
+                option.className = 'option';
+                option.textContent = label.name;
+                option.dataset.labelId = label.id;
+                option.onclick = function() {
+                    this.classList.toggle('selected');
+                    updateButtonText(button, options);
+                };
+                options.appendChild(option);
+            });
+
+            button.onclick = function(e) {
+                e.stopPropagation();
+                options.style.display = options.style.display === 'block' ? 'none' : 'block';
+            };
+
+            document.addEventListener('click', function() {
+                options.style.display = 'none';
+            });
+        }
+
         function updateButtonText(button, options) {
-            var selectedOptions = options.querySelectorAll('.member-option.selected');
+            var selectedOptions = options.querySelectorAll('.option.selected');
             if (selectedOptions.length === 0) {
-                button.textContent = 'Select members';
+                button.textContent = button.dataset.defaultText || 'Select options';
             } else if (selectedOptions.length === 1) {
                 button.textContent = selectedOptions[0].textContent;
             } else {
-                button.textContent = selectedOptions.length + ' members selected';
+                button.textContent = selectedOptions.length + ' selected';
             }
         }
 
-        // Populate members when the popup is opened
-        t.board('members')
-            .then(function(data) {
-                console.log('Fetched members:', data); // Log the data to see its structure
-                createMemberSelect(data.members); // Access the members array from the data object
-            })
-            .catch(function(error) {
-                console.error('Error fetching members:', error);
-                document.getElementById('error').textContent = 'Error fetching members. Please try again.';
-            });
+        // Populate members and labels when the popup is opened
+        Promise.all([
+            t.board('members'),
+            t.card('labels') // Fetch labels from the source card
+        ])
+        .then(function([members, card]) {
+            console.log('Fetched members:', members);
+            createMemberSelect(members);
+            console.log('Fetched labels:', card.labels);
+            createLabelSelect(card.labels); // Pass the labels to the label select function
+        })
+        .catch(function(error) {
+            console.error('Error fetching data:', error);
+            document.getElementById('error').textContent = 'Error fetching data. Please try again.';
+        });
 
         // Add event listener for the create button
         document.getElementById('createButton').addEventListener('click', function() {
             // Logic to create the project card goes here
-            // You can access selected members using the member options
+            // You can access selected members and labels using the options
         });
     </script>
 </body>
