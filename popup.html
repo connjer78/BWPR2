@@ -161,28 +161,28 @@
                             headers: {
                                 'Accept': 'application/json'
                             }
-                        });
-                    })
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error(`HTTP error! status: ${response.status}`);
-                        }
-                        return response.json();
-                    })
-                    .then(organizations => {
-                        console.log('Fetched organizations:', organizations); // Log the fetched organizations
-                        if (organizations.length === 0) {
-                            throw new Error('No organizations found for the user.');
-                        }
-                        const orgId = organizations[0].id; // Use the first organization ID
-                        console.log('Using Organization ID:', orgId); // Log the organization ID
-
-                        // Fetch boards for the organization
-                        return fetch(`https://api.trello.com/1/organizations/${orgId}/boards?filter=open&fields=name,id&key=${TRELLO_APP_KEY}&token=${token}`, {
-                            method: 'GET',
-                            headers: {
-                                'Accept': 'application/json'
+                        })
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error(`HTTP error! status: ${response.status}`);
                             }
+                            return response.json();
+                        })
+                        .then(organizations => {
+                            console.log('Fetched organizations:', organizations); // Log the fetched organizations
+                            if (organizations.length === 0) {
+                                throw new Error('No organizations found for the user.');
+                            }
+                            const orgId = organizations[0].id; // Use the first organization ID
+                            console.log('Using Organization ID:', orgId); // Log the organization ID
+
+                            // Fetch boards for the organization
+                            return fetch(`https://api.trello.com/1/organizations/${orgId}/boards?filter=open&fields=name,id&key=${TRELLO_APP_KEY}&token=${token}`, {
+                                method: 'GET',
+                                headers: {
+                                    'Accept': 'application/json'
+                                }
+                            });
                         });
                     })
                     .then(response => {
