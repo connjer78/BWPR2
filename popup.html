@@ -151,123 +151,25 @@
             t.card('id', 'name', 'labels') // Fetch the full card details including name and labels
         ])
         .then(function([membersData, card]) {
-            console.log('Fetched members:', membersData); // Log the data to see its structure
-            createMemberSelect(membersData.members); // Access the members array from the data object
-            console.log('Fetched labels:', card.labels);
-            createLabelSelect(card.labels); // Pass the labels to the label select function
+            console.log('Fetched members:', membersData); // Log the fetched members
+            console.log('Fetched card:', card); // Log the fetched card details
 
-            // Log the entire card object to check its structure
-            console.log('Fetched card:', card);
-
-            // Retrieve the source card name
-            var sourceCardName = card.name; // Get the name of the source card
-
-            // Function to get all boards in the workspace (organization)
-            function getAllBoardsInWorkspace() {
-                console.log('Fetching all boards in the workspace...');
-
-                // Fetch the authenticated user's organizations
-                return t.getRestApi().getToken()
-                    .then(function(token) {
-                        // Fetch the organizations for the authenticated user
-                        return fetch(`https://api.trello.com/1/members/me/organizations?key=${TRELLO_APP_KEY}&token=${token}`, {
-                            method: 'GET',
-                            headers: {
-                                'Accept': 'application/json'
-                            }
-                        })
-                        .then(response => {
-                            if (!response.ok) {
-                                throw new Error(`HTTP error! status: ${response.status}`);
-                            }
-                            return response.json();
-                        })
-                        .then(organizations => {
-                            console.log('Fetched organizations:', organizations); // Log the fetched organizations
-                            if (organizations.length === 0) {
-                                throw new Error('No organizations found for the user.');
-                            }
-                            const orgId = organizations[0].id; // Use the first organization ID
-                            console.log('Using Organization ID:', orgId); // Log the organization ID
-
-                            // Fetch boards for the organization
-                            return fetch(`https://api.trello.com/1/organizations/${orgId}/boards?filter=open&fields=name,id&key=${TRELLO_APP_KEY}&token=${token}`, {
-                                method: 'GET',
-                                headers: {
-                                    'Accept': 'application/json'
-                                }
-                            });
-                        });
-                    })
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error(`HTTP error! status: ${response.status}`);
-                        }
-                        return response.json();
-                    })
-                    .then(boards => {
-                        console.log('Fetched boards:', boards); // Log the fetched boards
-                        return boards; // Return the boards for further processing if needed
-                    })
-                    .catch(error => {
-                        console.error('Error fetching boards:', error); // Log any errors
-                        throw error; // Rethrow the error for further handling
-                    });
+            // Log the button and its state
+            const createCardButton = document.getElementById('createButton');
+            if (createCardButton) {
+                console.log('Button found: Create Project Card'); // Log if button is found
+            } else {
+                console.error('Button with ID "createButton" not found in the DOM.');
             }
 
-            // Example usage of the function
-            getAllBoardsInWorkspace()
-                .then(boards => {
-                    // You can do something with the boards here if needed
-                    console.log('Successfully retrieved boards:', boards);
-                })
-                .catch(error => {
-                    console.error('Failed to retrieve boards:', error);
-                });
-
-            // Function to get the first list ID from the "Projects" board
-            function getFirstListIdFromProjectsBoard() {
-                console.log('Getting Projects board ID...');
-
-                return t.getRestApi().getToken() // Fetch the token first
-                    .then(function(token) {
-                        return getAllBoardsInWorkspace()
-                            .then(boards => {
-                                // Find the "Projects" board
-                                const projectsBoard = boards.find(board => board.name === 'Projects');
-                                if (!projectsBoard) {
-                                    throw new Error('Projects board not found.');
-                                }
-                                console.log('Found Projects board:', projectsBoard);
-
-                                // Fetch the lists for the "Projects" board using the token
-                                return fetch(`https://api.trello.com/1/boards/${projectsBoard.id}/lists?key=${TRELLO_APP_KEY}&token=${token}`, {
-                                    method: 'GET',
-                                    headers: {
-                                        'Accept': 'application/json'
-                                    }
-                                });
-                            });
-                    })
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error(`HTTP error! status: ${response.status}`);
-                        }
-                        return response.json();
-                    })
-                    .then(lists => {
-                        console.log('Fetched lists for Projects board:', lists);
-                        if (lists.length === 0) {
-                            throw new Error('No lists found in the Projects board.');
-                        }
-                        return lists[0].id; // Return the ID of the first list
-                    })
-                    .catch(error => {
-                        console.error('Error fetching the first list ID:', error);
-                        throw error; // Rethrow the error for further handling
-                    });
-            }
-
+            // Log other relevant variables
+            console.log('Current token:', token); // Log the current token (if available)
+            
+            // Continue with the rest of your code...
+            // Create member and label select UI
+            createMemberSelect(membersData);
+            createLabelSelect(card.labels);
+            
             // Example usage of the function
             getFirstListIdFromProjectsBoard()
                 .then(listId => {
@@ -277,95 +179,6 @@
                 .catch(error => {
                     console.error('Failed to retrieve the first list ID:', error);
                 });
-
-            // Function to create a new card in the first list of the "Projects" board
-            function createCardInProjectsBoard(sourceCard) {
-                console.log('Creating a new card in the Projects board...');
-
-                return getFirstListIdFromProjectsBoard()
-                    .then(listId => {
-                        console.log('First list ID:', listId); // Log the list ID
-                        // Prepare the new card details
-                        const newCardName = sourceCard.name; // Copy the name from the source card
-                        const newCardDescription = sourceCard.desc; // Optionally copy the description
-
-                        // Create the new card using the Trello API
-                        console.log('Making API call to create card with details:', {
-                            name: newCardName,
-                            desc: newCardDescription,
-                            idList: listId
-                        });
-
-                        return fetch(`https://api.trello.com/1/cards?key=${TRELLO_APP_KEY}&token=${token}`, {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json'
-                            },
-                            body: JSON.stringify({
-                                name: newCardName,
-                                desc: newCardDescription,
-                                idList: listId // Use the ID of the first list
-                            })
-                        });
-                    })
-                    .then(response => {
-                        console.log('Response from card creation API:', response); // Log the response
-                        if (!response.ok) {
-                            return response.json().then(err => {
-                                throw new Error(`HTTP error! status: ${response.status}, message: ${err.message}`);
-                            });
-                        }
-                        return response.json();
-                    })
-                    .then(newCard => {
-                        console.log('New card created successfully:', newCard);
-                        t.closePopup(); // Close the popup after successful creation
-                    })
-                    .catch(error => {
-                        console.error('Error creating new card:', error);
-                        throw error; // Rethrow the error for further handling
-                    });
-            }
-
-            // Example button click handler to create a card
-            document.addEventListener('DOMContentLoaded', () => {
-                const createCardButton = document.getElementById('createButton');
-                if (createCardButton) {
-                    console.log('Button found: Create Project Card'); // Log if button is found
-                    createCardButton.addEventListener('click', () => {
-                        console.log('Create Project Card button clicked.'); // Log button click
-
-                        // Start a timeout to log if the listener isn't behaving properly
-                        const timeoutDuration = 10000; // 10 seconds
-                        const timeoutId = setTimeout(() => {
-                            console.error('Timeout: The button click event listener is not behaving as expected.');
-                        }, timeoutDuration);
-
-                        const sourceCard = {
-                            id: '67226ce3a49b474554362586',
-                            name: 'Testinggg',
-                            desc: 'This is a test card description.'
-                        };
-
-                        fetchToken() // Ensure the token is fetched before creating the card
-                            .then(() => {
-                                console.log('Token fetched successfully:', token);
-                                return createCardInProjectsBoard(sourceCard);
-                            })
-                            .then(() => {
-                                console.log('Card creation process completed.');
-                                clearTimeout(timeoutId); // Clear the timeout if everything works
-                                t.closePopup(); // Close the popup after successful creation
-                            })
-                            .catch(error => {
-                                console.error('Failed to create the new card:', error);
-                                clearTimeout(timeoutId); // Clear the timeout in case of an error
-                            });
-                    });
-                } else {
-                    console.error('Button with ID "createButton" not found in the DOM.');
-                }
-            });
         })
         .catch(function(error) {
             console.error('Error fetching data:', error);
