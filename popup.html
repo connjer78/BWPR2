@@ -136,9 +136,9 @@
             t.board('members'),
             t.card('labels') // Fetch labels from the source card
         ])
-        .then(function([members, card]) {
-            console.log('Fetched members:', members);
-            createMemberSelect(members);
+        .then(function([data, card]) {
+            console.log('Fetched members:', data); // Log the data to see its structure
+            createMemberSelect(data.members); // Access the members array from the data object
             console.log('Fetched labels:', card.labels);
             createLabelSelect(card.labels); // Pass the labels to the label select function
 
