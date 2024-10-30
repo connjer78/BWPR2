@@ -151,7 +151,7 @@
             // Function to get the ID of the "Projects" board
             function getProjectsBoardId() {
                 console.log('Fetching all boards for the member...');
-                return t.member('id', 'boards') // Fetch all boards for the member
+                return t.member('boards') // Fetch all boards for the member
                     .then(function(boards) {
                         console.log('Fetched boards:', boards); // Log the fetched boards
                         // Find the board named "Projects"
