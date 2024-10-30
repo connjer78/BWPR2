@@ -162,7 +162,30 @@
 
                 console.log('New Card Name:', newCardName); // Log the new card name
 
-                // Logic to create the project card goes here
+                // Retrieve selected members
+                var selectedMembers = Array.from(document.querySelectorAll('#member-options .option.selected'))
+                    .map(option => option.dataset.memberId);
+
+                // Retrieve selected labels
+                var selectedLabels = Array.from(document.querySelectorAll('#label-options .option.selected'))
+                    .map(option => option.dataset.labelId);
+
+                // Create the new card using the Trello API
+                t.cards('create', {
+                    name: newCardName,
+                    idList: 'YOUR_LIST_ID', // Replace with the ID of the list where you want to create the card
+                    idMembers: selectedMembers,
+                    idLabels: selectedLabels
+                })
+                .then(function() {
+                    console.log('Card created successfully!');
+                    // Optionally, close the popup or provide feedback to the user
+                    t.closePopup();
+                })
+                .catch(function(error) {
+                    console.error('Error creating card:', error);
+                    document.getElementById('error').textContent = 'Error creating card. Please try again.';
+                });
             });
         })
         .catch(function(error) {
