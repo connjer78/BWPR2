@@ -263,6 +263,62 @@
                 .catch(error => {
                     console.error('Failed to retrieve the first list ID:', error);
                 });
+
+            // Function to create a new card in the first list of the "Projects" board
+            function createCardInProjectsBoard(sourceCard) {
+                console.log('Creating a new card in the Projects board...');
+
+                // Get the first list ID from the Projects board
+                return getFirstListIdFromProjectsBoard()
+                    .then(listId => {
+                        // Prepare the new card details
+                        const newCardName = sourceCard.name; // Copy the name from the source card
+                        const newCardDescription = sourceCard.desc; // Optionally copy the description
+
+                        // Create the new card using the Trello API
+                        return fetch(`https://api.trello.com/1/cards?key=${TRELLO_APP_KEY}&token=${token}`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                name: newCardName,
+                                desc: newCardDescription,
+                                idList: listId // Use the ID of the first list
+                            })
+                        });
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+                        return response.json();
+                    })
+                    .then(newCard => {
+                        console.log('New card created successfully:', newCard);
+                        // Optionally, you can close the popup or provide feedback to the user
+                        // t.closePopup();
+                    })
+                    .catch(error => {
+                        console.error('Error creating new card:', error);
+                        throw error; // Rethrow the error for further handling
+                    });
+            }
+
+            // Example usage of the function
+            const sourceCard = {
+                id: '67226ce3a49b474554362586',
+                name: 'Testinggg',
+                desc: 'This is a test card description.'
+            };
+
+            createCardInProjectsBoard(sourceCard)
+                .then(() => {
+                    console.log('Card creation process completed.');
+                })
+                .catch(error => {
+                    console.error('Failed to create the new card:', error);
+                });
         })
         .catch(function(error) {
             console.error('Error fetching data:', error);
