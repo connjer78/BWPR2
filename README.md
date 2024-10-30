@@ -18,7 +18,7 @@ The Project Cards Power-Up is a custom Trello Power-Up that enhances project man
 For the Project Cards Power-Up to function correctly, your Trello workspace must meet the following requirements:
 
 1. A board named "Projects" must exist in the workspace.
-2. The "Projects" board must contain a list named "New Projects" where new project cards will be added.
+2. The "Projects" board must contain at least one list where new project cards will be added. The Power-Up will create new project cards in the first list found on the "Projects" board.
 
 Ensure these requirements are met before using the Power-Up to create project cards.
 
@@ -30,7 +30,7 @@ Ensure these requirements are met before using the Power-Up to create project ca
    - Choose multiple members to assign to the project card
    - Add any additional details or modifications
 3. The Power-Up then:
-   - Creates a new card in the "New Projects" list of the "Projects" board
+   - Creates a new card in the first list of the "Projects" board
    - Copies the labels from the source account card
    - Applies the selected due date and member assignments
    - Adds a link back to the source account card on the new project card

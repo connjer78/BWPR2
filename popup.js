@@ -30,33 +30,30 @@ document.getElementById('create-project').addEventListener('click', function() {
     .then(function (card) {
       return t.board('id', 'name')
         .then(function (board) {
-          // Find or create 'Projects' board
+          // Find the 'Projects' board
           return t.rest.get(`/members/me/boards?filter=open&fields=name,id`)
             .then(function (boards) {
               var projectsBoard = boards.find(b => b.name === 'Projects');
               if (!projectsBoard) {
-                // Create 'Projects' board if it doesn't exist
-                return t.rest.post('/boards', { name: 'Projects', defaultLists: false });
+                throw new Error("Projects board does not exist.");
               }
               return projectsBoard;
             });
         })
         .then(function (projectsBoard) {
-          // Find or create 'New Projects' list
+          // Get the first list on the 'Projects' board
           return t.rest.get(`/boards/${projectsBoard.id}/lists`)
             .then(function (lists) {
-              var newProjectsList = lists.find(l => l.name === 'New Projects');
-              if (!newProjectsList) {
-                return t.rest.post(`/boards/${projectsBoard.id}/lists`, { name: 'New Projects' });
+              if (lists.length === 0) {
+                throw new Error("No lists found on the Projects board.");
               }
-              return newProjectsList;
-            })
-            .then(function (newProjectsList) {
-              // Create new project card
+              // Use the first list
+              var firstList = lists[0];
+              // Create new project card in the first list
               return t.rest.post('/cards', {
                 name: `Project: ${card.name}`,
                 desc: `Created from account card: ${card.shortUrl}`,
-                idList: newProjectsList.id,
+                idList: firstList.id,
                 due: dueDate,
                 idMembers: selectedMembers,
                 idLabels: card.labels.map(label => label.id)
