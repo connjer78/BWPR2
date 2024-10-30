@@ -151,7 +151,16 @@
             t.card('id', 'name', 'labels') // Fetch the full card details including name and labels
         ])
         .then(function([membersData, card]) {
-            console.log('Fetched members:', membersData); // Log the fetched members
+            // Access the members array correctly
+            const members = membersData.members; // Assuming membersData is an object with a 'members' property
+            console.log('Fetched members:', members); // Log the fetched members
+
+            // Check if members is an array
+            if (!Array.isArray(members)) {
+                console.error('Fetched members is not an array:', members);
+                return; // Exit if members is not an array
+            }
+
             console.log('Fetched card:', card); // Log the fetched card details
 
             // Log the button and its state
@@ -165,9 +174,8 @@
             // Log other relevant variables
             console.log('Current token:', token); // Log the current token (if available)
             
-            // Continue with the rest of your code...
             // Create member and label select UI
-            createMemberSelect(membersData);
+            createMemberSelect(members); // Pass the members array to the function
             createLabelSelect(card.labels);
             
             // Example usage of the function
