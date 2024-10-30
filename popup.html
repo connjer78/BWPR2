@@ -202,8 +202,18 @@
 
         function getFirstListIdFromProjectsBoard() {
             return new Promise((resolve, reject) => {
-                // Fetch the lists from the Projects board
-                t.board('lists') // Ensure you are using the correct board ID
+                // Fetch all boards first
+                t.getBoards('me') // Adjust this if you need to specify a different user or organization
+                    .then(boards => {
+                        // Find the Projects board
+                        const projectsBoard = boards.find(board => board.name === 'Projects');
+                        if (!projectsBoard) {
+                            return reject('Projects board not found.');
+                        }
+
+                        // Now fetch the lists from the Projects board
+                        return t.board(projectsBoard.id + '/lists'); // Use the ID of the Projects board
+                    })
                     .then(lists => {
                         console.log('Fetched lists:', lists); // Log the fetched lists
                         if (lists.length > 0) {
