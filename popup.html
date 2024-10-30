@@ -134,7 +134,7 @@
         // Populate members and labels when the popup is opened
         Promise.all([
             t.board('members'),
-            t.card('labels') // Fetch labels from the source card
+            t.card('id', 'name', 'labels') // Fetch the full card details including name and labels
         ])
         .then(function([membersData, card]) {
             console.log('Fetched members:', membersData); // Log the data to see its structure
