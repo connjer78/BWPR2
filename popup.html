@@ -74,6 +74,9 @@
                 .then(fetchedToken => {
                     token = fetchedToken; // Store the token in a higher scope variable
                     console.log('Fetched token:', token);
+                })
+                .catch(error => {
+                    console.error('Error fetching token:', error);
                 });
         }
 
@@ -287,6 +290,12 @@
                         const newCardDescription = sourceCard.desc; // Optionally copy the description
 
                         // Create the new card using the Trello API
+                        console.log('Making API call to create card with details:', {
+                            name: newCardName,
+                            desc: newCardDescription,
+                            idList: listId
+                        });
+
                         return fetch(`https://api.trello.com/1/cards?key=${TRELLO_APP_KEY}&token=${token}`, {
                             method: 'POST',
                             headers: {
