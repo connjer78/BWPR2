@@ -315,21 +315,29 @@
             }
 
             // Example button click handler to create a card
-            document.getElementById('createCardButton').addEventListener('click', () => {
-                const sourceCard = {
-                    id: '67226ce3a49b474554362586',
-                    name: 'Testinggg',
-                    desc: 'This is a test card description.'
-                };
+            document.addEventListener('DOMContentLoaded', () => {
+                // Ensure the button exists before adding the event listener
+                const createCardButton = document.getElementById('createCardButton');
+                if (createCardButton) {
+                    createCardButton.addEventListener('click', () => {
+                        const sourceCard = {
+                            id: '67226ce3a49b474554362586',
+                            name: 'Testinggg',
+                            desc: 'This is a test card description.'
+                        };
 
-                fetchToken() // Ensure the token is fetched before creating the card
-                    .then(() => createCardInProjectsBoard(sourceCard))
-                    .then(() => {
-                        console.log('Card creation process completed.');
-                    })
-                    .catch(error => {
-                        console.error('Failed to create the new card:', error);
+                        fetchToken() // Ensure the token is fetched before creating the card
+                            .then(() => createCardInProjectsBoard(sourceCard))
+                            .then(() => {
+                                console.log('Card creation process completed.');
+                            })
+                            .catch(error => {
+                                console.error('Failed to create the new card:', error);
+                            });
                     });
+                } else {
+                    console.error('Button with ID "createCardButton" not found in the DOM.');
+                }
             });
         })
         .catch(function(error) {
