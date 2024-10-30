@@ -60,25 +60,10 @@
         <button id="createButton" class="mod-primary">Create Project Card</button>
     </div>
     <script>
-        var TRELLO_APP_KEY = '6fd96e65b3bbfbf2c88bd5eb871fab8a'; // Your API key
         var t = window.TrelloPowerUp.iframe({
-            appKey: TRELLO_APP_KEY,
+            appKey: 'YOUR_API_KEY', // Replace with your actual API key
             appName: 'Start Project!'
         });
-
-        let token; // Declare token in a higher scope
-
-        // Function to fetch the token and store it
-        function fetchToken() {
-            return t.getRestApi().getToken()
-                .then(fetchedToken => {
-                    token = fetchedToken; // Store the token in a higher scope variable
-                    console.log('Fetched token:', token);
-                })
-                .catch(error => {
-                    console.error('Error fetching token:', error);
-                });
-        }
 
         // Function to create the member select UI
         function createMemberSelect(members) {
@@ -145,89 +130,18 @@
             }
         }
 
-        // Populate members and labels when the popup is opened
-        Promise.all([
-            t.board('members'),
-            t.card('id', 'name', 'labels') // Fetch the full card details including name and labels
-        ])
-        .then(function([membersData, card]) {
-            // Access the members array correctly
-            const members = membersData.members; // Assuming membersData is an object with a 'members' property
-            console.log('Fetched members:', members); // Log the fetched members
-
-            // Check if members is an array
-            if (!Array.isArray(members)) {
-                console.error('Fetched members is not an array:', members);
-                return; // Exit if members is not an array
-            }
-
-            console.log('Fetched card:', card); // Log the fetched card details
-
-            // Log the button and its state
-            const createCardButton = document.getElementById('createButton');
-            if (createCardButton) {
-                console.log('Button found: Create Project Card'); // Log if button is found
-            } else {
-                console.error('Button with ID "createButton" not found in the DOM.');
-            }
-
-            // Log other relevant variables
-            console.log('Current token:', token); // Log the current token (if available)
+        // Create the card with the suffix when the button is clicked
+        document.getElementById('createButton').onclick = function() {
+            const suffix = document.getElementById('newCardSuffix').value; // Get the suffix from the input
+            const selectedMembers = Array.from(document.querySelectorAll('#member-options .option.selected')).map(option => option.dataset.memberId);
+            const selectedLabels = Array.from(document.querySelectorAll('#label-options .option.selected')).map(option => option.dataset.labelId);
             
-            // Create member and label select UI
-            createMemberSelect(members); // Pass the members array to the function
-            createLabelSelect(card.labels);
+            // Logic to create the card with the suffix, selected members, and labels
+            const cardName = `New Card ${suffix}`; // Example card name with suffix
             
-            // Example usage of the function
-            fetchToken()
-                .then(() => {
-                    console.log('Token fetched successfully:', token);
-                    getFirstListIdFromProjectsBoard()
-                        .then(listId => {
-                            console.log('First list ID from Projects board:', listId);
-                            // You can now use this listId to create new cards
-                        })
-                        .catch(error => {
-                            console.error('Failed to retrieve the first list ID:', error);
-                        });
-                })
-                .catch(error => {
-                    console.error('Error fetching token:', error);
-                });
-        })
-        .catch(function(error) {
-            console.error('Error fetching data:', error);
-            document.getElementById('error').textContent = 'Error fetching data. Please try again.';
-        });
-
-        function getFirstListIdFromProjectsBoard() {
-            return new Promise((resolve, reject) => {
-                // Fetch all boards first
-                t.getBoards('me') // Adjust this if you need to specify a different user or organization
-                    .then(boards => {
-                        // Find the Projects board
-                        const projectsBoard = boards.find(board => board.name === 'Projects');
-                        if (!projectsBoard) {
-                            return reject('Projects board not found.');
-                        }
-
-                        // Now fetch the lists from the Projects board
-                        return t.board(projectsBoard.id + '/lists'); // Use the ID of the Projects board
-                    })
-                    .then(lists => {
-                        console.log('Fetched lists:', lists); // Log the fetched lists
-                        if (lists.length > 0) {
-                            resolve(lists[0].id); // Resolve with the first list ID
-                        } else {
-                            reject('No lists found in the Projects board.');
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error fetching lists:', error); // Log the error
-                        reject('Error fetching lists: ' + error); // Reject with the error message
-                    });
-            });
-        }
+            // Call your function to create the card here, passing the cardName, selectedMembers, and selectedLabels
+            console.log('Creating card:', cardName, 'with members:', selectedMembers, 'and labels:', selectedLabels);
+        };
     </script>
 </body>
 </html>
