@@ -68,7 +68,7 @@
 
         // Function to create the member select UI
         function createMemberSelect(members) {
-            var button = document.querySelector('.select-button'); // Select the member button
+            var button = document.querySelector('#member-select-container .select-button'); // Select the member button
             var options = document.getElementById('member-options');
 
             members.forEach(function(member) {
@@ -136,9 +136,9 @@
             t.board('members'),
             t.card('labels') // Fetch labels from the source card
         ])
-        .then(function([data, card]) {
-            console.log('Fetched members:', data); // Log the data to see its structure
-            createMemberSelect(data.members); // Access the members array from the data object
+        .then(function([membersData, card]) {
+            console.log('Fetched members:', membersData); // Log the data to see its structure
+            createMemberSelect(membersData.members); // Access the members array from the data object
             console.log('Fetched labels:', card.labels);
             createLabelSelect(card.labels); // Pass the labels to the label select function
 
