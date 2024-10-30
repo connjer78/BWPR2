@@ -152,22 +152,38 @@
             function getAllBoardsInWorkspace() {
                 console.log('Fetching all boards in the workspace...');
 
-                // Get the organization ID first
-                return t.member('organization')
-                    .then(function(organization) {
-                        const orgId = organization.id; // Get the organization ID
-                        console.log('Organization ID:', orgId); // Log the organization ID
+                // Fetch the authenticated user's organizations
+                return t.getRestApi().getToken()
+                    .then(function(token) {
+                        // Fetch the organizations for the authenticated user
+                        return fetch(`https://api.trello.com/1/members/me/organizations?key=${TRELLO_APP_KEY}&token=${token}`, {
+                            method: 'GET',
+                            headers: {
+                                'Accept': 'application/json'
+                            }
+                        });
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+                        return response.json();
+                    })
+                    .then(organizations => {
+                        console.log('Fetched organizations:', organizations); // Log the fetched organizations
+                        if (organizations.length === 0) {
+                            throw new Error('No organizations found for the user.');
+                        }
+                        const orgId = organizations[0].id; // Use the first organization ID
+                        console.log('Using Organization ID:', orgId); // Log the organization ID
 
-                        return t.getRestApi().getToken() // Get the token for API calls
-                            .then(function(token) {
-                                // Fetch boards for the organization
-                                return fetch(`https://api.trello.com/1/organizations/${orgId}/boards?filter=open&fields=name,id&token=${token}`, {
-                                    method: 'GET',
-                                    headers: {
-                                        'Accept': 'application/json'
-                                    }
-                                });
-                            });
+                        // Fetch boards for the organization
+                        return fetch(`https://api.trello.com/1/organizations/${orgId}/boards?filter=open&fields=name,id&key=${TRELLO_APP_KEY}&token=${token}`, {
+                            method: 'GET',
+                            headers: {
+                                'Accept': 'application/json'
+                            }
+                        });
                     })
                     .then(response => {
                         if (!response.ok) {
@@ -177,7 +193,6 @@
                     })
                     .then(boards => {
                         console.log('Fetched boards:', boards); // Log the fetched boards
-                        // Process the boards as needed
                         return boards; // Return the boards for further processing if needed
                     })
                     .catch(error => {
