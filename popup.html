@@ -99,7 +99,8 @@
         // Populate members when the popup is opened
         t.board('members')
             .then(function(members) {
-                createMemberSelect(members);
+                console.log('Fetched members:', members); // Log the members to see their structure
+                createMemberSelect(members); // Use the same function to create the member select UI
             })
             .catch(function(error) {
                 console.error('Error fetching members:', error);
