@@ -1,22 +1,116 @@
 <!DOCTYPE html>
 <html>
-  <head>
+<head>
     <link rel="stylesheet" href="https://p.trellocdn.com/power-up.min.css">
-    <link rel="stylesheet" href="./style.css">
     <script src="https://p.trellocdn.com/power-up.min.js"></script>
-  </head>
-  <body>
-    <form id="create-project-form">
-      <label for="due-date">Due Date:</label>
-      <input type="date" id="due-date" name="due-date">
-      
-      <label for="members">Assign Members:</label>
-      <select id="members" name="members" multiple>
-        <!-- Options will be populated dynamically -->
-      </select>
-      
-      <button type="button" class="button" id="create-project">Create Project Card</button>
-    </form>
-    <script src="./popup.js"></script>
-  </body>
+    <style>
+        body { 
+            padding: 10px; 
+            overflow-y: auto;
+        }
+        .member-select-wrapper {
+            margin-top: 5px;
+        }
+        .member-select-button {
+            width: 100%;
+            text-align: left;
+            padding: 5px;
+            background-color: var(--ds-surface);
+            border: 1px solid var(--ds-border);
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        .member-options {
+            display: none;
+            position: absolute;
+            background-color: var(--ds-surface);
+            border: 1px solid var(--ds-border);
+            border-radius: 3px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 1000;
+        }
+        .member-option {
+            padding: 5px;
+            cursor: pointer;
+        }
+        .member-option:hover {
+            background-color: var(--ds-background-neutral-hovered);
+        }
+        .member-option.selected {
+            background-color: var(--ds-background-neutral-selected);
+        }
+    </style>
+</head>
+<body>
+    <div id="error" class="error"></div>
+    <div id="content">
+        <div id="member-select-container" class="member-select-wrapper">
+            <button class="member-select-button">Select members</button>
+            <div class="member-options" id="member-options"></div>
+        </div>
+        <button id="createButton" class="mod-primary">Create Project Card</button>
+    </div>
+    <script>
+        var TRELLO_APP_KEY = '6fd96e65b3bbfbf2c88bd5eb871fab8a'; // Your API key
+        var t = window.TrelloPowerUp.iframe({
+            appKey: TRELLO_APP_KEY,
+            appName: 'Start Project!'
+        });
+
+        // Function to create the member select UI
+        function createMemberSelect(members) {
+            var button = document.querySelector('.member-select-button');
+            var options = document.getElementById('member-options');
+
+            members.forEach(function(member) {
+                var option = document.createElement('div');
+                option.className = 'member-option';
+                option.textContent = member.fullName;
+                option.dataset.memberId = member.id;
+                option.onclick = function() {
+                    this.classList.toggle('selected');
+                    updateButtonText(button, options);
+                };
+                options.appendChild(option);
+            });
+
+            button.onclick = function(e) {
+                e.stopPropagation();
+                options.style.display = options.style.display === 'block' ? 'none' : 'block';
+            };
+
+            document.addEventListener('click', function() {
+                options.style.display = 'none';
+            });
+        }
+
+        function updateButtonText(button, options) {
+            var selectedOptions = options.querySelectorAll('.member-option.selected');
+            if (selectedOptions.length === 0) {
+                button.textContent = 'Select members';
+            } else if (selectedOptions.length === 1) {
+                button.textContent = selectedOptions[0].textContent;
+            } else {
+                button.textContent = selectedOptions.length + ' members selected';
+            }
+        }
+
+        // Populate members when the popup is opened
+        t.board('members')
+            .then(function(members) {
+                createMemberSelect(members);
+            })
+            .catch(function(error) {
+                console.error('Error fetching members:', error);
+                document.getElementById('error').textContent = 'Error fetching members. Please try again.';
+            });
+
+        // Add event listener for the create button
+        document.getElementById('createButton').addEventListener('click', function() {
+            // Logic to create the project card goes here
+            // You can access selected members using the member options
+        });
+    </script>
+</body>
 </html>
