@@ -211,27 +211,55 @@
                     console.error('Failed to retrieve boards:', error);
                 });
 
-            // Function to get the first list from the "Projects" board
-            function getFirstListId() {
+            // Function to get the first list ID from the "Projects" board
+            function getFirstListIdFromProjectsBoard() {
                 console.log('Getting Projects board ID...');
-                return getProjectsBoardId()
-                    .then(function(boardId) {
-                        console.log('Fetching lists for board ID:', boardId); // Log the board ID
-                        return t.board(boardId, 'lists') // Fetch the lists for the "Projects" board
-                            .then(function(board) {
-                                console.log('Fetched lists for Projects board:', board.lists); // Log the fetched lists
-                                if (board.lists.length > 0) {
-                                    return board.lists[0].id; // Return the ID of the first list
-                                } else {
-                                    throw new Error('No lists found in the Projects board');
-                                }
-                            });
+
+                return getAllBoardsInWorkspace()
+                    .then(boards => {
+                        // Find the "Projects" board
+                        const projectsBoard = boards.find(board => board.name === 'Projects');
+                        if (!projectsBoard) {
+                            throw new Error('Projects board not found.');
+                        }
+                        console.log('Found Projects board:', projectsBoard);
+
+                        // Fetch the lists for the "Projects" board
+                        return fetch(`https://api.trello.com/1/boards/${projectsBoard.id}/lists?key=${TRELLO_APP_KEY}&token=${token}`, {
+                            method: 'GET',
+                            headers: {
+                                'Accept': 'application/json'
+                            }
+                        });
                     })
-                    .catch(function(error) {
-                        console.error('Error fetching lists:', error); // Log any errors
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+                        return response.json();
+                    })
+                    .then(lists => {
+                        console.log('Fetched lists for Projects board:', lists);
+                        if (lists.length === 0) {
+                            throw new Error('No lists found in the Projects board.');
+                        }
+                        return lists[0].id; // Return the ID of the first list
+                    })
+                    .catch(error => {
+                        console.error('Error fetching the first list ID:', error);
                         throw error; // Rethrow the error for further handling
                     });
             }
+
+            // Example usage of the function
+            getFirstListIdFromProjectsBoard()
+                .then(listId => {
+                    console.log('First list ID from Projects board:', listId);
+                    // You can now use this listId to create new cards
+                })
+                .catch(error => {
+                    console.error('Failed to retrieve the first list ID:', error);
+                });
         })
         .catch(function(error) {
             console.error('Error fetching data:', error);
