@@ -72,7 +72,8 @@
         function fetchToken() {
             return t.getRestApi().getToken()
                 .then(fetchedToken => {
-                    token = fetchedToken; // Store the token in the higher scope variable
+                    token = fetchedToken; // Store the token in a higher scope variable
+                    console.log('Fetched token:', token);
                 });
         }
 
@@ -280,6 +281,7 @@
 
                 return getFirstListIdFromProjectsBoard()
                     .then(listId => {
+                        console.log('First list ID:', listId);
                         // Prepare the new card details
                         const newCardName = sourceCard.name; // Copy the name from the source card
                         const newCardDescription = sourceCard.desc; // Optionally copy the description
@@ -305,8 +307,8 @@
                     })
                     .then(newCard => {
                         console.log('New card created successfully:', newCard);
-                        // Optionally, you can close the popup or provide feedback to the user
-                        // t.closePopup();
+                        // Optionally close the popup or provide feedback to the user
+                        t.closePopup();
                     })
                     .catch(error => {
                         console.error('Error creating new card:', error);
@@ -316,7 +318,6 @@
 
             // Example button click handler to create a card
             document.addEventListener('DOMContentLoaded', () => {
-                // Ensure the button exists before adding the event listener
                 const createCardButton = document.getElementById('createCardButton');
                 if (createCardButton) {
                     createCardButton.addEventListener('click', () => {
@@ -327,9 +328,14 @@
                         };
 
                         fetchToken() // Ensure the token is fetched before creating the card
-                            .then(() => createCardInProjectsBoard(sourceCard))
+                            .then(() => {
+                                console.log('Token fetched successfully:', token);
+                                return createCardInProjectsBoard(sourceCard);
+                            })
                             .then(() => {
                                 console.log('Card creation process completed.');
+                                // Optionally close the popup if the card was created successfully
+                                t.closePopup();
                             })
                             .catch(error => {
                                 console.error('Failed to create the new card:', error);
