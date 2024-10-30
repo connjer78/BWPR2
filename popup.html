@@ -53,6 +53,10 @@
             <button class="select-button">Select labels</button>
             <div class="options" id="label-options"></div>
         </div>
+        <div class="select-wrapper">
+            <label for="newCardSuffix">New Card Suffix:</label>
+            <input type="text" id="newCardSuffix" placeholder="Enter suffix here" />
+        </div>
         <button id="createButton" class="mod-primary">Create Project Card</button>
     </div>
     <script>
@@ -145,8 +149,20 @@
 
         // Add event listener for the create button
         document.getElementById('createButton').addEventListener('click', function() {
+            var suffix = document.getElementById('newCardSuffix').value.trim(); // Get the user-defined suffix and trim whitespace
+            var sourceCardName = "Mama's Fried Chicken"; // Replace with the actual source card name
+            var newCardName;
+
+            // Construct the new card name based on the suffix
+            if (suffix) {
+                newCardName = `${sourceCardName}: ${suffix}`; // Format: "sourceCardName: suffix"
+            } else {
+                newCardName = sourceCardName; // Use the source card name if suffix is blank
+            }
+
+            console.log('New Card Name:', newCardName); // Log the new card name
+
             // Logic to create the project card goes here
-            // You can access selected members and labels using the options
         });
     </script>
 </body>
